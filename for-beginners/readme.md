@@ -92,15 +92,56 @@ fruits:
 
 # YAML in kubernetes
 
+Pods:
+
 (root level properties/required fields)
 
 apiVersion: (pods=v1, service=v1, replicaset=apps/v1, deployment=apps/v1)
 kind: (type of obj)
 metadata: (name(string), labels(dict(app, type etc))(siblings) etc)(in matadata only what k8s considers metadata, but labels => your wish)
 
-spec: (object info)(containers(list) containing dict(name, image) as elements)
+spec: (object info)(containers(list->container per element) containing dict(name, image) as elements)
 
-kubectl create -f pod-defination.yml
+kubectl create/apply -f pod-defination.yml
+
+![alt text](image-1.png)
 
 
+# replication controller 
+helps run multiple instances of a single pod (or get one up if current pod goes down) providing high avability, load-balancing and scaling. Now this has been replaced by "replicaSet"
 
+->all nest defination files
+
+- replication controller:
+apiVersion: v1
+kind: ReplicationController
+metadata: (name(string), labels(dict(app, type etc))(siblings) etc)(in matadata only what k8s considers metadata, but labels => your wish)
+
+spec: (object info)(template: (pod template ie the content of pod.yml exept apiVersion and kind))(replicas: number required)
+
+ps: selector is also present here but by default takes the value of labels provided in the pod defination files.
+
+- replicaSet:
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata: (name(string), labels(dict(app, type etc))(siblings) etc)(in matadata only what k8s considers metadata, but labels => your wish)
+
+spec: (object info)(template: (pod template ie the content of pod.yml exept apiVersion and kind))(replicas: number required)(selector: helps replica set identify what pods fall under it, as can manage pods existing before the replica set creation (matchLabels: key-pair to match with the metadata of the pods))
+
+
+they provide a way to monitor the pods and know which pods to minitor using labels.
+
+for replica-set even if the req no of pods exist and the template is currently not needed, we still need to provide it as we need to spin up new containers if one of the pre exiusting goes down
+
+to increase(scale) the nuber of pods:
+- modify the yml file
+- kubectl scale --replicas=6 -f replicaset-definition.yml(wont affect the number in the file)
+- kubectl edit replicaset myapp(set name), opens the running config of the set, applied as soon as saved
+- also can be increased based on load(would be discussed later)
+
+![alt text](image-2.png)
+
+if you delete a pod new one is spun up, if more than required are created(manually) the extras are terminated
+
+
+# Deployments
