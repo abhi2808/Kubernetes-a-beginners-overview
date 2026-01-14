@@ -195,17 +195,6 @@ connections:
 - by sshing into node(not ideal)
 - service acts as a middle men, listen to port on the node and forward req on that port to a port on the pod running the application this is  "nodePort(the port on node) service" teh target port is on the pod
 
-2) fend node->bend node
-
-cluster ip creates a virtual ip inside the cluster to allow communication bw set fend and bendservers
-
-3) node to external service
-
-loadbalancer service
-
-
-# creating services
-
 apiVerison: v1
 kind: Service
 metadata:
@@ -215,9 +204,47 @@ spec:
   ports: 
    - targetPort: 80(on pod)(default: same as port)
      port: 80(on service server has a cluster ip)(mandatory)
-     nodePort: 30008(port on node)
+     nodePort: 30008(port on node)(30000-32767)
   selector:
     app: my-app
 
 many pods: no problem as matched using labels
 pods across nodes: services spans across all nodes, so can access app using ip of any node in cluster but same port-number available
+
+![alt text](image-3.png)
+cluster ip is created for the service automatically
+
+
+2) fend node->bend node
+
+cluster ip creates a virtual ip inside the cluster to allow communication bw grou fend and bend servers. Allow a accessibility as a group( effective for microservice architecture)
+
+apiVerison: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  type: ClusterIP(cluster ip is the default)
+  ports:
+    - targetPort: 80 (where backend is exposed)
+      port: 80 (where service is exposed)
+  selector:
+    app: my-app
+
+3) node to external service
+
+loadbalancer service, to employ external load balancing from a supported cloud provider
+
+apiVerison: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  type: LoadBalancer
+  ports:
+    - targetPort: 80 
+      port: 80
+  selector:
+    app: my-app
+
+
