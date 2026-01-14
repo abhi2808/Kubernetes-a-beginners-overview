@@ -248,3 +248,42 @@ spec:
     app: my-app
 
 
+# Microservices
+
+voiting app eg -> voting-app, redis, worker, mysql, results-app
+
+using link flag to connect docker containers is deprecated, use diff approach
+
+to expose one service to another asip changes we need a service(cluster IP)->2-> redis and postgres
+
+1 nodeport services each for voting and result app too 
+
+demo:
+
+kubectl apply -f . (to apply for entire directory)
+
+![alt text](image-4.png)
+
+![alt text](image-5.png)
+
+kubectl get node -o wide
+
+GPT{
+minikube service vote --url, creates a dynamic proxy tunnel from your Windows host's localhost (127.0.0.1:61968) to the NodePort inside the Minikube Docker container, bypassing networking limitations. Direct access to http://192.168.49.2:31000 fails because the Docker driver runs Minikube as a container without automatic host port publishing or NAT forwarding for high NodePorts on Windows.
+​
+
+Docker Driver Limitation
+The Docker driver lacks VM-style networking, so NodePorts (30000-32767) on the container IP (192.168.49.2) aren't reachable from the host without manual port mapping or SSH tunneling. Minikube's service command handles this by running a persistent proxy process in the foreground terminal.
+​}
+
+![alt text](image-6.png)
+
+![alt text](image-7.png)
+
+
+# kubernetes on cloud
+
+k8s-> 
+1) self hosted/turnkey-> provision, configure, maintain and write scripts on the VM yourself. kops and kubeone in aws.
+
+2) hosted/managed->  k8s as a service, providers does everything(managed master nodes). eg GKE
