@@ -281,6 +281,34 @@ The Docker driver lacks VM-style networking, so NodePorts (30000-32767) on the c
 ![alt text](image-7.png)
 
 
+i have implemengted this using 2 approaches i.e. using only pods and using deployments, remember just scaling the number of replicas for db may cause consistency issues, to prevent use persitent volumes.
+
+
+in ideal scenario use{
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-pvc
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 1Gi
+
+in worker node add->
+env:  # ADDED: DB connection for INSERT success
+        - name: POSTGRES_DB
+          value: vote
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          value: postgres
+
+}
+
+while testing vote using incognito tabs or diff browsers, as the code is configured to evaluate session cookies, if voting is done using diff tabs of 1 browser shows only 1 vote!!(almost lost my mid over this)
+
 # kubernetes on cloud
 
 k8s-> 
